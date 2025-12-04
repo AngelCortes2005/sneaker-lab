@@ -30,7 +30,3 @@ The system combines **React**, **Next.js**, **React Three Fiber**, and advanced 
 - **TailwindCSS** (styling)
 - **Framer Motion** (animations)
 - **TypeScript** (strict typing)
-
----
-
-## 📁 Project Structure
