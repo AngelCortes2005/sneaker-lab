@@ -64,8 +64,8 @@ const Categories = () => {
                 chaos={0.2}
                 thickness={2}
               >
-                <div className="relative bg-gradient-to-br from-black/80 to-gray-900/60 backdrop-blur-sm overflow-hidden group cursor-pointer">
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-20 transition-opacity`} />
+                <div className="relative bg-linear-to-br from-black/80 to-gray-900/60 backdrop-blur-sm overflow-hidden group cursor-pointer">
+                  <div className={`absolute inset-0 bg-linear-to-br ${category.gradient} opacity-0 group-hover:opacity-20 transition-opacity`} />
                   
                   <div className="p-8 text-center">
                     <div className="text-7xl mb-4 group-hover:scale-110 transition-transform">
