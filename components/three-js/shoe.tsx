@@ -26,7 +26,7 @@ function Shoe(props: any) {
     ref.current.position.y = (0.5 + Math.cos(t / 2)) / 7
   })
   return (
-    <group ref={ref} >
+    <group ref={ref} scale={1.2}>
       <mesh receiveShadow castShadow geometry={nodes.defaultMaterial.geometry} material={materials.NikeShoe} {...props} />
     </group>
   )
