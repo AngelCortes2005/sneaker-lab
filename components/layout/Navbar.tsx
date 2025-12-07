@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Zap } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, X, User, Heart } from "lucide-react";
+import { ShoppingCart, Menu, X, User, Heart, LogOut, Settings, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/store/cart-store";
 import { useFavoritesStore } from "@/lib/store/favorites-store";
+import { useUserStore } from "@/lib/store/user-store";
 import SearchBar from "@/components/SearchBar";
+import AuthDialog from "@/components/AuthDialog";
 import {
   Sheet,
   SheetContent,
@@ -18,16 +20,27 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  
   const itemCount = useCartStore((state) => state.getItemCount());
   const items = useCartStore((state) => state.items);
   const total = useCartStore((state) => state.getTotal());
   const removeItem = useCartStore((state) => state.removeItem);
-  // Acceder directamente al array
   const favoriteCount = useFavoritesStore((state) => state.favorites.length);
+  const { user, isAuthenticated, logout } = useUserStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,6 +50,13 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Sesión cerrada', {
+      description: 'Has cerrado sesión correctamente',
+    });
+  };
 
   const navLinks = [
     { name: "Inicio", href: "/" },
@@ -102,13 +122,69 @@ const Navbar = () => {
                 </Button>
               </Link>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:text-cyan-400 hidden md:flex"
-              >
-                <User className="w-5 h-5" />
-              </Button>
+              {/* User Menu */}
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white hover:text-cyan-400 hidden md:flex relative"
+                    >
+                      {user?.avatar ? (
+                        <Image
+                          src={user.avatar}
+                          alt={user.name}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      ) : (
+                        <User className="w-5 h-5" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-56 bg-black/95 backdrop-blur-xl border-white/10 text-white"
+                  >
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium">{user?.name}</p>
+                        <p className="text-xs text-gray-400">{user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+                      <Link href="/pedidos" className="flex items-center w-full">
+                        <Package className="w-4 h-4 mr-2" />
+                        Mis Pedidos
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer hover:bg-white/5">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Configuración
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-white/10" />
+                    <DropdownMenuItem 
+                      onClick={handleLogout}
+                      className="cursor-pointer hover:bg-red-500/10 text-red-400"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Cerrar Sesión
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowAuthDialog(true)}
+                  className="text-white hover:text-cyan-400 hidden md:flex"
+                >
+                  <User className="w-5 h-5" />
+                </Button>
+              )}
 
               {/* Cart */}
               <Sheet>
@@ -155,8 +231,14 @@ const Navbar = () => {
                           exit={{ opacity: 0, x: -20 }}
                           className="flex gap-4 p-4 bg-white/5 rounded-lg border border-white/10"
                         >
-                          <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center">
-                            <span className="text-3xl"><Image src={item.image} alt={item.name} width={80} height={80} /></span>
+                          <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center overflow-hidden">
+                            <Image 
+                              src={item.image} 
+                              alt={item.name} 
+                              width={80} 
+                              height={80}
+                              className="object-contain"
+                            />
                           </div>
                           <div className="flex-1">
                             <h4 className="font-semibold line-clamp-1">
@@ -257,15 +339,35 @@ const Navbar = () => {
                       )}
                     </Button>
                   </Link>
-                  <Button variant="ghost" size="icon" className="text-white">
-                    <User className="w-5 h-5" />
-                  </Button>
+                  {isAuthenticated ? (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleLogout}
+                      className="text-red-400 hover:text-red-300"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Cerrar Sesión
+                    </Button>
+                  ) : (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setShowAuthDialog(true)}
+                      className="text-white"
+                    >
+                      <User className="w-5 h-5" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.nav>
+
+      {/* Auth Dialog */}
+      <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
 
       {/* Spacer */}
       <div className="h-20" />
