@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { Bebas_Neue } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { ToastProvider } from "@/components/providers/ToastProvider";
+import Footer from "@/components/layout/Footer";
 
-const bebasNeue = Bebas_Neue({
-  variable: "--font-bebas-neue",
-  subsets: ["latin"],
-  weight: "400"
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sneaker Lab",
-  description: "Explore sneakers with Sneaker Lab",
+  title: "SneakerLab - Premium Sneaker Store",
+  description: "Descubre las mejores zapatillas del mercado",
 };
 
 export default function RootLayout({
@@ -20,12 +18,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${bebasNeue.variable} antialiased`}
-      >
+    <html lang="es">
+      <body className={`${inter.className} bg-gray-700`}>
         <Navbar />
         {children}
+        <ToastProvider />
+        <Footer />
       </body>
     </html>
   );

@@ -1,23 +1,23 @@
 import React from 'react'
-import Shoes from '../components/three-js/shoe'
-import Hero from '../components/Hero'
-import Features from '../components/Features'
-import FeaturedProducts from '../components/FeaturedProducts'
-import Categories from '../components/Categories'
-import Newsletter from '../components/NewsLetter'
-import Footer from '../components/layout/Footer'
+import Hero from '@/components/Hero';
+import FeaturedProducts from '@/components/FeaturedProducts';
+import Categories from '@/components/Categories';
+import Reviews from '@/components/Reviews';
+import Newsletter from '@/components/NewsLetter';
+import FAQ from '@/components/FAQ';
+import { getSneakers } from '@/lib/action/general.actions';
 
-const page = () => {
+export default async function Home() {
+  const sneakers = await getSneakers(8);
+
   return (
-    <div className=''>
+    <>
       <Hero />
-      <Features />
-      <FeaturedProducts />
+      <FeaturedProducts sneakers={sneakers} />
       <Categories />
+      <Reviews />
       <Newsletter />
-      <Footer />
-    </div>
-  )
+      <FAQ />
+    </>
+  );
 }
-
-export default page
