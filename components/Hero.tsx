@@ -135,7 +135,7 @@ const Hero = () => {
                 transition={{ delay: 0.4 }}
                 className="text-lg sm:text-xl md:text-2xl text-gray-300 drop-shadow-lg max-w-xl mx-auto lg:mx-0"
               >
-                Diseña, personaliza y visualiza tus zapatillas favoritas en tiempo real con tecnología 3D
+                Cada paso cuenta una historia. Encuentra las sneakers que llevarán la tuya al siguiente nivel.
               </motion.p>
             </div>
 
