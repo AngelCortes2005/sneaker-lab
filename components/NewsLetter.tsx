@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import ElectricBorder from './ElectricBorder';
+import ResponsiveBorder from './ResponsiveBorder'; // ← Cambiar aquí
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail } from 'lucide-react';
@@ -51,7 +51,7 @@ const Newsletter = () => {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto"
         >
-          <ElectricBorder
+          <ResponsiveBorder
             color="#7df9ff"
             speed={1}
             chaos={0.5}
@@ -117,7 +117,7 @@ const Newsletter = () => {
                 </div>
               </motion.div>
             </div>
-          </ElectricBorder>
+          </ResponsiveBorder>
         </motion.div>
       </div>
     </section>

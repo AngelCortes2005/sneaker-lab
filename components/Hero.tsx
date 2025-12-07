@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import ElectricBorder from "./ElectricBorder";
 import { Button } from "./ui/button";
 import { ArrowRight, Sparkles, Zap } from "lucide-react";
+import ResponsiveBorder from './ResponsiveBorder'; // ← Cambiar aquí
 
 const DynamicShoes = dynamic(() => import("./three-js/shoe"), {
   ssr: false,
@@ -215,8 +216,7 @@ const Hero = () => {
                 {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 via-[#7df9ff]/40 to-blue-600/30 rounded-3xl blur-3xl -z-10 animate-pulse"></div>
 
-                {/* 3D Viewer Container */}
-                <ElectricBorder
+                <ResponsiveBorder
                   color="#7df9ff"
                   speed={1}
                   chaos={0.3}
@@ -267,7 +267,7 @@ const Hero = () => {
                       </div>
                     )}
                   </div>
-                </ElectricBorder>
+                </ResponsiveBorder>
 
 
               </div>
