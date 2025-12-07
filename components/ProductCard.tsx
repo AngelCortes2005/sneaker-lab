@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { ShoppingCart, Heart, Eye, Star } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import ElectricBorder from '@/components/ElectricBorder';
-import { useCartStore } from '@/lib/store/cart-store';
-import { useFavoritesStore } from '@/lib/store/favorites-store';
-import type { Sneaker } from '@/lib/action/general.actions';
-import { toast } from 'sonner';
+import { motion } from "framer-motion";
+import { ShoppingCart, Heart, Eye, Star } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import ElectricBorder from "@/components/ElectricBorder";
+import { useCartStore } from "@/lib/store/cart-store";
+import { useFavoritesStore } from "@/lib/store/favorites-store";
+import type { Sneaker } from "@/lib/action/general.actions";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   sneaker: Sneaker;
@@ -25,7 +25,7 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     addItem(sneaker);
-    toast.success('Agregado al carrito', {
+    toast.success("Agregado al carrito", {
       description: sneaker.name,
     });
   };
@@ -34,9 +34,12 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     toggleFavorite(sneaker.id);
-    toast.success(isFavorite ? 'Eliminado de favoritos' : 'Agregado a favoritos', {
-      description: sneaker.name,
-    });
+    toast.success(
+      isFavorite ? "Eliminado de favoritos" : "Agregado a favoritos",
+      {
+        description: sneaker.name,
+      }
+    );
   };
 
   return (
@@ -46,22 +49,22 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
       viewport={{ once: true }}
       transition={{ delay: index * 0.1 }}
     >
-      <ElectricBorder color="#7df9ff" speed={0.8} chaos={0.2} thickness={2}>
         <Link href={`/productos/${sneaker.id}`} className="block">
           <div className="bg-gradient-to-br from-black/80 to-gray-900/60 backdrop-blur-sm overflow-hidden group">
             {/* Product Image */}
             <div className="relative h-64 bg-gradient-to-br from-gray-800/50 to-gray-900/50 overflow-hidden cursor-pointer">
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-              
+
               <div className="w-full h-full flex items-center justify-center p-4 group-hover:scale-110 transition-transform duration-500">
-                {sneaker.image && sneaker.image.startsWith('http') ? (
+                {sneaker.image && sneaker.image.startsWith("http") ? (
                   <Image
                     src={sneaker.image}
                     alt={sneaker.name}
-                    fill
+                    fill // ← Usar fill en lugar de width/height
                     className="object-contain"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     loading="lazy"
+                    quality={60} // ← Reducir calidad
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                   />
                 ) : (
                   <div className="text-6xl">👟</div>
@@ -70,12 +73,14 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
 
               {/* Quick Actions */}
               <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
+                <button
                   onClick={handleToggleFavorite}
                   className="p-2 bg-black/60 backdrop-blur-sm hover:bg-black/80 rounded-lg transition-all"
                 >
-                  <Heart 
-                    className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+                  <Heart
+                    className={`w-4 h-4 ${
+                      isFavorite ? "fill-red-500 text-red-500" : "text-white"
+                    }`}
                   />
                 </button>
                 <div className="p-2 bg-black/60 backdrop-blur-sm hover:bg-black/80 rounded-lg transition-all">
@@ -111,7 +116,7 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
                 </h3>
                 <p className="text-xs text-gray-500 mt-1">{sneaker.colorway}</p>
               </div>
-              
+
               {/* Rating */}
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -119,8 +124,8 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
                     key={i}
                     className={`w-3 h-3 ${
                       i < Math.floor(sneaker.rating)
-                        ? 'fill-yellow-500 text-yellow-500'
-                        : 'text-gray-600'
+                        ? "fill-yellow-500 text-yellow-500"
+                        : "text-gray-600"
                     }`}
                   />
                 ))}
@@ -153,7 +158,7 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
                     ${sneaker.price.toFixed(2)}
                   </span>
                 </div>
-                <Button 
+                <Button
                   className="bg-gradient-to-r from-blue-600 to-[#7df9ff] text-black font-bold hover:scale-105 transition-transform"
                   onClick={handleAddToCart}
                 >
@@ -164,7 +169,6 @@ const ProductCard = ({ sneaker, index = 0 }: ProductCardProps) => {
             </div>
           </div>
         </Link>
-      </ElectricBorder>
     </motion.div>
   );
 };

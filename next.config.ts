@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
-
-const nextConfig = {
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+const nextConfig: NextConfig = {
   /* config options here */
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -17,7 +16,12 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+    formats: ["image/avif", "image/webp"],
+  },
+  compress: true,
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ["framer-motion", "lucide-react", "@radix-ui/react-icons"],
   },
 };
-
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);

@@ -2,8 +2,17 @@
 import { use, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, MeshTransmissionMaterial, ContactShadows, Environment } from '@react-three/drei'
+import dynamic from 'next/dynamic';
 
-
+// Exporta solo cuando se necesite
+const Shoe3D = dynamic(() => import('./shoe'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white" />
+    </div>
+  )
+});
 
 export default function Shoes() {
   return (
