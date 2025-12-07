@@ -1,6 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
-import ElectricBorder from './ElectricBorder';
+import ResponsiveBorder from './ResponsiveBorder'; // ← Cambiar aquí
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
@@ -69,7 +69,7 @@ const Categories = () => {
               transition={{ delay: index * 0.1 }}
               className="group"
             >
-              <ElectricBorder
+              <ResponsiveBorder
                 color="#7df9ff"
                 speed={0.8}
                 chaos={0.2}
@@ -187,7 +187,7 @@ const Categories = () => {
                     </div>
                   </div>
                 </Link>
-              </ElectricBorder>
+              </ResponsiveBorder>
             </motion.div>
           ))}
         </div>
