@@ -1,172 +1,275 @@
-'use client';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ElectricBorder from "../ElectricBorder";
-import { Button } from '@/components/ui/button';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { Zap } from "lucide-react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart, Menu, X, User, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/lib/store/cart-store";
+import { useFavoritesStore } from "@/lib/store/favorites-store";
+import SearchBar from "@/components/SearchBar";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@/components/ui/sheet';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
-import { Menu, Zap, Home, Palette, Image, DollarSign, Mail } from 'lucide-react';
-import Link from 'next/link';
+} from "@/components/ui/sheet";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const itemCount = useCartStore((state) => state.getItemCount());
+  const items = useCartStore((state) => state.items);
+  const total = useCartStore((state) => state.getTotal());
+  const removeItem = useCartStore((state) => state.removeItem);
+  // Acceder directamente al array
+  const favoriteCount = useFavoritesStore((state) => state.favorites.length);
 
-  const menuItems = [
-    { name: 'Inicio', href: '#' },
-    { name: 'Diseñador 3D', href: '#designer'},
-    { name: 'Galería', href: '#gallery'},
-    { name: 'Precios', href: '#pricing'},
-    { name: 'Contacto', href: '#contact'},
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Inicio", href: "/" },
+    { name: "Productos", href: "/productos" },
+    { name: "Categorías", href: "/categorias" },
+    { name: "Contacto", href: "/contacto" },
   ];
 
   return (
-    <nav className=" bg-black/50 backdrop-blur-lg fixed w-full z-30 top-0 left-0 border-b border-white/10">
-      <div className="">
-        <div className="relative overflow-hidden">
-          <ElectricBorder
-            color="#7df9ff"
-            speed={1}
-            chaos={0.3}
-            thickness={2}
-          >
-            <div className="">
-              <div className="flex items-center justify-between px-6 py-3">
-                {/* Logo */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center gap-2 cursor-pointer"
+    <>
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-black/80 backdrop-blur-xl border-b border-white/10`}
+      >
+        <div className="container mx-auto px-6">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <Link href="/" className="flex items-center space-x-3 group">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className="text-4xl"
+              >
+                <div className="relative bg-gradient-to-r from-blue-600 to-[#7df9ff] rounded-lg p-2">
+                  <Zap className="w-6 h-6 text-white" />
+                </div>
+              </motion.div>
+              <span className="text-2xl font-black bg-gradient-to-r from-blue-500 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                SneakerLab
+              </span>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-gray-300 hover:text-white transition-colors relative group"
                 >
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-[#7df9ff] blur-md opacity-50"></div>
-                    <div className="relative bg-gradient-to-r from-blue-600 to-[#7df9ff] rounded-lg p-2">
-                      <Zap className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                  <span className="text-xl font-black">
-                    Sneaker Lab
-                  </span>
-                </motion.div>
+                  {link.name}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-400 group-hover:w-full transition-all duration-300" />
+                </Link>
+              ))}
+            </div>
 
-                {/* Desktop Navigation Menu */}
-                <div className="hidden md:block">
-                  <NavigationMenu>
-                    <NavigationMenuList>
-                      {menuItems.map((item, index) => (
-                        <NavigationMenuItem key={item.name}>
-                          <Link href={item.href} legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                              <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex items-center gap-2 text-white"
-                              >
-                                {item.name}
-                              </motion.div>
-                            </NavigationMenuLink>
-                          </Link>
-                        </NavigationMenuItem>
-                      ))}
-                    </NavigationMenuList>
-                  </NavigationMenu>
-                </div>
+            {/* Actions */}
+            <div className="flex items-center space-x-4">
+              <SearchBar />
 
-                {/* Desktop CTA Buttons */}
-                <div className="hidden md:flex items-center gap-3">
-                  <Button 
-                    variant="ghost" 
-                    className="text-white hover:bg-white/10 hover:text-white"
+              <Link href="/favoritos">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-white hover:text-cyan-400 hidden md:flex relative"
+                >
+                  <Heart className="w-5 h-5" />
+                  {favoriteCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {favoriteCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-white hover:text-cyan-400 hidden md:flex"
+              >
+                <User className="w-5 h-5" />
+              </Button>
+
+              {/* Cart */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-white hover:text-cyan-400 relative"
                   >
-                    Iniciar Sesión
-                  </Button>
-                  <Button 
-                    className="relative bg-gradient-to-r from-blue-600 to-[#7df9ff] text-black font-bold hover:scale-105 transition-transform"
-                  >
-                    Comenzar
-                  </Button>
-                </div>
-
-                {/* Mobile Menu Sheet */}
-                <div className="md:hidden">
-                  <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                    <SheetTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="text-white hover:bg-white/10"
+                    <ShoppingCart className="w-5 h-5" />
+                    {itemCount > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-600 to-cyan-400 text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
                       >
-                        <Menu className="w-6 h-6" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent 
-                      side="right" 
-                      className="bg-black/95 backdrop-blur-xl border-white/10 text-white"
-                    >
-                      <SheetHeader>
-                        <SheetTitle className="flex items-center gap-2 text-white">
-                          <div className="bg-gradient-to-r from-blue-600 to-[#7df9ff] rounded-lg p-2">
-                            <Zap className="w-5 h-5 text-white" />
-                          </div>
-                          Sneaker Lab
-                        </SheetTitle>
-                      </SheetHeader>
-                      <div className="flex flex-col gap-4 mt-8">
-                        {menuItems.map((item, index) => (
-                          <motion.div
-                            key={item.name}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.1 }}
-                          >
-                            <Link href={item.href}>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-white hover:text-white hover:bg-white/10"
-                                onClick={() => setIsOpen(false)}
-                              >
-                                {item.name}
-                              </Button>
-                            </Link>
-                          </motion.div>
-                        ))}
-                        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-white/10">
-                          <Button 
-                            variant="ghost" 
-                            className="w-full text-white hover:bg-white/10"
-                          >
-                            Iniciar Sesión
-                          </Button>
-                          <Button 
-                            className="w-full bg-gradient-to-r from-blue-600 to-[#7df9ff] text-black font-bold"
-                          >
-                            Comenzar
-                          </Button>
-                        </div>
+                        {itemCount}
+                      </motion.span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="bg-black/95 backdrop-blur-xl border-white/10 text-white w-full sm:max-w-lg p-4">
+                  <SheetHeader>
+                    <SheetTitle className="text-2xl font-bold text-white">
+                      Carrito de Compras
+                    </SheetTitle>
+                    <SheetDescription className="text-gray-400">
+                      {itemCount} {itemCount === 1 ? "artículo" : "artículos"}
+                    </SheetDescription>
+                  </SheetHeader>
+
+                  <div className="mt-8 space-y-4 max-h-[60vh] overflow-y-auto">
+                    {items.length === 0 ? (
+                      <div className="text-center py-12">
+                        <ShoppingCart className="w-16 h-16 mx-auto text-gray-600 mb-4" />
+                        <p className="text-gray-400">Tu carrito está vacío</p>
                       </div>
-                    </SheetContent>
-                  </Sheet>
+                    ) : (
+                      items.map((item) => (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          className="flex gap-4 p-4 bg-white/5 rounded-lg border border-white/10"
+                        >
+                          <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center">
+                            <span className="text-3xl"><Image src={item.image} alt={item.name} width={80} height={80} /></span>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold line-clamp-1">
+                              {item.name}
+                            </h4>
+                            <p className="text-sm text-gray-400">
+                              {item.brand}
+                            </p>
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="font-bold text-cyan-400">
+                                ${item.price.toFixed(2)}
+                              </span>
+                              <span className="text-sm text-gray-400">
+                                Cantidad: {item.quantity}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeItem(item.id)}
+                            className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+
+                  {items.length > 0 && (
+                    <div className="mt-8 space-y-4">
+                      <div className="flex items-center justify-between text-lg font-bold border-t border-white/10 pt-4">
+                        <span>Total:</span>
+                        <span className="text-cyan-400">
+                          ${total.toFixed(2)}
+                        </span>
+                      </div>
+                      <Link href="/checkout" className="block">
+                        <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-400 text-black font-bold hover:scale-105 transition-transform">
+                          Proceder al Pago
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </SheetContent>
+              </Sheet>
+
+              {/* Mobile Menu Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-white"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10"
+            >
+              <div className="container mx-auto px-6 py-6 space-y-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block text-gray-300 hover:text-white transition-colors py-2"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+                <div className="flex items-center gap-4 pt-4 border-t border-white/10">
+                  <Link href="/favoritos">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-white relative"
+                    >
+                      <Heart className="w-5 h-5" />
+                      {favoriteCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {favoriteCount}
+                        </span>
+                      )}
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="icon" className="text-white">
+                    <User className="w-5 h-5" />
+                  </Button>
                 </div>
               </div>
-            </div>
-          </ElectricBorder>
-        </div>
-      </div>
-    </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* Spacer */}
+      <div className="h-20" />
+    </>
   );
 };
 
