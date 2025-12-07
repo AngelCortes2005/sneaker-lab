@@ -69,12 +69,6 @@ const FeaturedProducts = ({ sneakers }: FeaturedProductsProps) => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <ElectricBorder
-                color="#7df9ff"
-                speed={0.8}
-                chaos={0.2}
-                thickness={2}
-              >
                 <Link href={`/productos/${sneaker.id}`} className="block">
                   <div className="bg-gradient-to-br from-black/80 to-gray-900/60 backdrop-blur-sm overflow-hidden group">
                     {/* Product Image */}
@@ -193,7 +187,6 @@ const FeaturedProducts = ({ sneakers }: FeaturedProductsProps) => {
                     </div>
                   </div>
                 </Link>
-              </ElectricBorder>
             </motion.div>
           ))}
         </div>

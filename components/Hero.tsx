@@ -48,7 +48,7 @@ const Hero = () => {
         baseColor={[0.1, 0.1, 0.1]}
         speed={0.1}
         amplitude={0.6}
-        interactive={true}
+        interactive={false}
         className="absolute inset-0 z-0"
       />
 
