@@ -3,10 +3,10 @@ import { Suspense, useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { LiquidChrome } from "./LiquidChrome";
 import { motion } from "framer-motion";
-import ElectricBorder from "./ElectricBorder";
+import GlowBorder from "./GlowBorder"; // ← Cambiar a GlowBorder
 import { Button } from "./ui/button";
-import { ArrowRight, Sparkles, Zap } from "lucide-react";
-import ResponsiveBorder from './ResponsiveBorder'; // ← Cambiar aquí
+import { ArrowRight, Zap } from "lucide-react";
+import Link from "next/link";
 
 const DynamicShoes = dynamic(() => import("./three-js/shoe"), {
   ssr: false,
@@ -23,16 +23,20 @@ const DynamicShoes = dynamic(() => import("./three-js/shoe"), {
 });
 
 const Hero = () => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default mobile para SSR
   const [shouldLoad3D, setShouldLoad3D] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+    
     const checkMobile = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      // Solo cargar 3D en desktop después de 500ms
-      if (!mobile) {
-        setTimeout(() => setShouldLoad3D(true), 500);
+      
+      // Solo cargar 3D en desktop después de 2 segundos
+      if (!mobile && !shouldLoad3D) {
+        setTimeout(() => setShouldLoad3D(true), 2000);
       }
     };
     
@@ -40,54 +44,65 @@ const Hero = () => {
     window.addEventListener('resize', checkMobile);
     
     return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  }, [shouldLoad3D]);
 
   return (
     <div className="relative w-full min-h-screen overflow-hidden">
-      {/* Background */}
-      <LiquidChrome
-        baseColor={[0.1, 0.1, 0.1]}
-        speed={0.1}
-        amplitude={0.6}
-        interactive={false}
-        className="absolute inset-0 z-0"
-      />
+      {/* Background - Condicional para mobile/desktop */}
+      {mounted && !isMobile ? (
+        // Desktop: LiquidChrome animado
+        <LiquidChrome
+          baseColor={[0.1, 0.1, 0.1]}
+          speed={0.1}
+          amplitude={0.6}
+          interactive={false}
+          className="absolute inset-0 z-0"
+        />
+      ) : (
+        // Mobile: Gradiente estático
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-gray-900 to-black">
+          {/* Efecto de textura sutil */}
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_50%_50%,rgba(125,249,255,0.1),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        </div>
+      )}
 
       {/* Gradient Overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 z-10" />
-      <div className="absolute inset-0 bg-gradient-radial from-transparent via-transparent to-black/40 z-10" />
 
-      {/* Floating Elements */}
-      <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            y: [0, 20, 0],
-            opacity: [0.3, 0.6, 0.3],
-          }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-          className="absolute bottom-20 right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"
-        />
-      </div>
+      {/* Floating Elements - Solo desktop */}
+      {!isMobile && (
+        <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-20 left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              y: [0, 20, 0],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{
+              duration: 5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1,
+            }}
+            className="absolute bottom-20 right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"
+          />
+        </div>
+      )}
 
       {/* Content Grid */}
-      <div className="relative z-20 container mx-auto px-4 md:px-6 min-h-screen flex items-center pb-16 ">
+      <div className="relative z-20 container mx-auto px-4 md:px-6 min-h-screen flex items-center pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 w-full items-center">
           
           {/* Left Content */}
@@ -97,8 +112,6 @@ const Hero = () => {
             transition={{ duration: 0.8 }}
             className="flex flex-col gap-8 max-w-2xl mx-auto lg:mx-0 text-center lg:text-left"
           >
-
-
             {/* Title */}
             <div className="space-y-4">
               <motion.h1 
@@ -133,24 +146,28 @@ const Hero = () => {
               transition={{ delay: 0.5 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button 
-                size="lg"
-                className="group relative bg-gradient-to-r from-blue-600 to-[#7df9ff] text-black font-bold text-lg px-8 py-6 hover:scale-105 transition-transform overflow-hidden"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  Explorar Colección
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#7df9ff] to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </Button>
+              <Link href="/productos">
+                <Button 
+                  size="lg"
+                  className="group relative bg-gradient-to-r from-blue-600 to-[#7df9ff] text-black font-bold text-lg px-8 py-6 hover:scale-105 transition-transform overflow-hidden w-full sm:w-auto"
+                >
+                  <span className="relative z-10 flex items-center gap-2 justify-center">
+                    Explorar Colección
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#7df9ff] to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Button>
+              </Link>
               
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-2 border-white/20 bg-white/5 backdrop-blur-sm text-white font-bold text-lg px-8 py-6 hover:bg-white/10 hover:border-[#7df9ff]/50 transition-all"
-              >
-                Contactenos
-              </Button>
+              <Link href="/contacto">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white/20 bg-white/5 backdrop-blur-sm text-white font-bold text-lg px-8 py-6 hover:bg-white/10 hover:border-[#7df9ff]/50 transition-all w-full sm:w-auto"
+                >
+                  Contáctanos
+                </Button>
+              </Link>
             </motion.div>
 
             {/* Stats */}
@@ -182,15 +199,13 @@ const Hero = () => {
                 transition={{ delay: 0.7 }}
                 className="relative rounded-3xl overflow-hidden shadow-2xl w-full max-w-md mx-auto"
               >
-                <ElectricBorder
+                <GlowBorder
                   color="#7df9ff"
-                  speed={1}
-                  chaos={0.5}
                   thickness={3}
                 >
                   <div className="relative aspect-video">
                     <video
-                      src="runner-hero.mp4"
+                      src="/runner-hero.mp4"
                       autoPlay
                       loop
                       muted
@@ -199,7 +214,7 @@ const Hero = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                   </div>
-                </ElectricBorder>
+                </GlowBorder>
               </motion.div>
             )}
           </motion.div>
@@ -214,15 +229,13 @@ const Hero = () => {
             >
               <div className="relative flex justify-center items-center h-[500px] lg:h-[600px] w-full">
                 {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 via-[#7df9ff]/40 to-blue-600/30 rounded-3xl blur-3xl -z-10 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 via-[#7df9ff]/40 to-blue-600/30 rounded-3xl blur-3xl -z-10 animate-pulse" />
 
-                <ResponsiveBorder
+                <GlowBorder
                   color="#7df9ff"
-                  speed={1}
-                  chaos={0.3}
                   thickness={3}
                 >
-                  <div className="relative h-[500px] lg:h-[400px] lg:w-[450px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-black/80 via-gray-900/60 to-black/80 backdrop-blur-xl border border-white/10">
+                  <div className="relative h-[500px] lg:h-[400px] lg:w-[450px] w-full overflow-hidden rounded-xl bg-gradient-to-br from-black/80 via-gray-900/60 to-black/80 backdrop-blur-xl border border-white/10">
                     
                     {/* Header del viewer 3D */}
                     <div className="absolute z-10 m-2 flex items-center justify-between">
@@ -241,8 +254,8 @@ const Hero = () => {
                           <div className="flex h-full items-center justify-center">
                             <div className="text-center space-y-4">
                               <div className="relative mx-auto">
-                                <div className="h-16 w-16 rounded-full border-t-2 border-b-2 border-[#7df9ff] animate-spin"></div>
-                                <div className="absolute inset-0 h-16 w-16 rounded-full border-2 border-[#7df9ff]/20 animate-pulse"></div>
+                                <div className="h-16 w-16 rounded-full border-t-2 border-b-2 border-[#7df9ff] animate-spin" />
+                                <div className="absolute inset-0 h-16 w-16 rounded-full border-2 border-[#7df9ff]/20 animate-pulse" />
                               </div>
                               <div>
                                 <p className="text-sm font-medium text-white mb-1">
@@ -261,15 +274,12 @@ const Hero = () => {
                     ) : (
                       <div className="flex h-full items-center justify-center">
                         <div className="text-center">
-                          <div className="text-8xl mb-4 animate-bounce">👟</div>
                           <p className="text-gray-400">Inicializando...</p>
                         </div>
                       </div>
                     )}
                   </div>
-                </ResponsiveBorder>
-
-
+                </GlowBorder>
               </div>
             </motion.div>
           )}
